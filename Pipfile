@@ -11,6 +11,7 @@ flask = "*"
 "boto3" = "*"
 arrow = "*"
 pylint = "*"
+gunicorn = "*"
 
 
 [dev-packages]

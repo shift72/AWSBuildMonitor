@@ -19,6 +19,9 @@ def loop_pipines(pipelines):
 
     return pipes
 
+def get_pipelines():
+    client = boto3.client('codepipeline')
+    return map(lambda p: p['name'], client.list_pipelines()['pipelines'])
 
 def get_pipeline_status(pipelinename):
     """ Get Pipeline State From Config File
@@ -44,7 +47,7 @@ def parse_pipeline_status(dict_data):
         try:
             blocks['status'] = item['actionStates'][0]['latestExecution']['status']
         except:
-            blocks['status'] = 'InProgress'
+            blocks['status'] = 'BrandNew'
 
         try:
             blocks['percentage'] = item['actionStates'][0]['latestExecution']['percentComplete']
@@ -57,6 +60,14 @@ def parse_pipeline_status(dict_data):
             blocks['last'] = (arrow.get(last)).humanize()
         except:
             blocks['last'] = 'Never'
+
+        try:
+            blocks['url'] = item['actionStates'][0]['latestExecution']['externalExecutionUrl']
+        except:
+            try:
+                blocks['url'] = item['actionStates'][0]['revisionUrl']
+            except:
+                blocks['url'] = None
 
         if blocks['status'] == 'Failed':
             blocks['error_msg'] = item['actionStates'][0]['latestExecution']['errorDetails']['message']
@@ -76,9 +87,9 @@ def dashboard():
     # Set Keys from Config
     config = configparser.ConfigParser()
     config.sections()
-    config.read('enviroment.ini')
+    config.read('environment.ini')
 
-    pipelines = config['development']['pipelinename'].split(",")
+    pipelines = get_pipelines()
     projectname = config['development']['projectname']
     refresh = config['development']['refresh']
 
