@@ -40,6 +40,8 @@ def parse_pipeline_status(dict_data):
     blocks = {}
     list_blocks = []
 
+    most_recent = arrow.utcnow().shift(years=-1000)
+
     # Compile Data
     for item in dict_data['stageStates']:
         blocks['name'] = item['actionStates'][0]['actionName']
@@ -56,8 +58,10 @@ def parse_pipeline_status(dict_data):
 
         # Get Human Readable Arrow
         try:
-            last = item['actionStates'][0]['latestExecution']['lastStatusChange']
-            blocks['last'] = (arrow.get(last)).humanize()
+            last = arrow.get(item['actionStates'][0]['latestExecution']['lastStatusChange'])
+            if last > most_recent:
+                most_recent = last
+            blocks['last'] = last.humanize()
         except:
             blocks['last'] = 'Never'
 
@@ -74,7 +78,7 @@ def parse_pipeline_status(dict_data):
 
         list_blocks.append(blocks.copy())
 
-    return {'Name': pipeline_name, 'Stages':list_blocks}
+    return {'Name': pipeline_name, 'Stages': list_blocks, 'Updated': most_recent}
 
 
 app = Flask(__name__)
@@ -95,6 +99,8 @@ def dashboard():
 
     # Build List of Pipelines
     pipes = loop_pipines(pipelines)
+    pipes.sort(key=lambda p: p['Updated'])
+    pipes.reverse()
 
     return render_template('pipeline.html', pipes=pipes, projectname=projectname, refresh=refresh)
 
@@ -125,5 +131,9 @@ def dashboard_test():
                 time_last['actionStates'][0]['latestExecution']['lastStatusChange'] = datetime.date.today()
             output = parse_pipeline_status(data)
             pipes.append(output)
+            print(output['Updated'])
+
+    pipes.sort(key=lambda p: p['Updated'])
+    pipes.reverse()
 
     return render_template('pipeline.html', pipes=pipes, projectname=projectname, refresh=refresh)
