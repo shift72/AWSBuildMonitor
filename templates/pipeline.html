@@ -3,7 +3,7 @@
 
 {% for pipe in pipes %}
 
-<h3 class="text-white">{{pipe.Name}} AWS CodePipeline Status </h3>
+<h3 class="text-white">{{pipe.Name}} <span class="last-updated">- {{pipe.Updated.humanize()}}</span></h3>
 
 <div class="card-deck">
     
@@ -53,9 +53,6 @@
     {% elif stage.status == 'InProgress' %}
     <small class="small">Building in Progress...</small>
     {% endif %}
-    </div>
-    <div class="card-footer">
-    <small class="text-white small">Last updated {{stage.last}}</small>
     </div>
 
     {% if stage.url != None %}
