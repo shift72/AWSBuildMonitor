@@ -3,7 +3,7 @@
 
 {% for pipe in pipes %}
 
-<h3 class="text-white">{{pipe.Name}} <span class="last-updated">- {{pipe.Updated.humanize()}}</span></h3>
+<a href="https://ap-southeast-2.console.aws.amazon.com/codepipeline/home?region=ap-southeast-2#/view/{{pipe.Name}}"><h3 class="text-white">{{pipe.Name}} <span class="last-updated">- {{pipe.Updated.humanize()}}</span></h3></a>
 
 <div class="card-deck">
     

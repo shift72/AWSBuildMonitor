@@ -56,7 +56,6 @@ def parse_pipeline_status(dict_data):
         except:
             blocks['percentage'] = 'Unknown'
 
-        # Get Human Readable Arrow
         try:
             last = arrow.get(item['actionStates'][0]['latestExecution']['lastStatusChange'])
             if last > most_recent:
