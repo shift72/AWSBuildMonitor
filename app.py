@@ -56,6 +56,11 @@ def parse_pipeline_status(dict_data):
         except:
             blocks['percentage'] = 'Unknown'
 
+        if 'currentRevision' in item['actionStates'][0]:
+            blocks['revisionId'] = item['actionStates'][0]['currentRevision']['revisionId'][:7]
+        else:
+            blocks['revisionId'] = None
+
         try:
             last = arrow.get(item['actionStates'][0]['latestExecution']['lastStatusChange'])
             if last > most_recent:
@@ -68,7 +73,7 @@ def parse_pipeline_status(dict_data):
             blocks['url'] = item['actionStates'][0]['latestExecution']['externalExecutionUrl']
         except:
             try:
-                blocks['url'] = item['actionStates'][0]['revisionUrl']
+                blocks['url'] = item['actionStates'][0]['revisionUrl']   
             except:
                 blocks['url'] = None
 
